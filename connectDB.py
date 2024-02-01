@@ -12,8 +12,7 @@ except mysql.connector.Error as err:
     print("Database does not exist")
   else:
     print(err)
-
-
+# TIKUN
 
 if cnx and cnx.is_connected():
 
