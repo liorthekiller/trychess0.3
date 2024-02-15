@@ -129,30 +129,58 @@ def draw_pieces():
 def check_options(pieces, locations, turn):
     moves_list = []
     all_moves_list = []
-    for i in range((len(pieces))):
-        piece_location = locations[i]
+    for i in range(len(pieces)):
+        piece_location = locations[i]  # This line is causing the error
         piece = pieces[i]
         if piece == 'pawn':
             moves_list = check_pawn(piece_location, turn)
-        # elif piece == 'rook':
-        #     moves_list == check_rook(locations, turn)
-        # elif piece == 'knight':
-        #     moves_list == check_knight(locations, turn)
+        elif piece == 'rook':
+            moves_list = check_rook(piece_location, turn)
+        elif piece == 'knight':
+            moves_list == check_knight(piece_location, turn)
         # elif piece == 'bishop':
-        #     moves_list == check_bishop(locations, turn)
+        #     moves_list == check_bishop(piece_location, turn)
         # elif piece == 'queen':
-        #     moves_list == check_queen(locations, turn)
+        #     moves_list == check_queen(piece_location, turn)
         # elif piece == 'king':
-        #     moves_list == check_king(locations, turn)
+        #     moves_list == check_king(piece_location, turn)
         all_moves_list.append(moves_list)
     return all_moves_list
 
-# def check_rook(positions,color):
-#     moves_list = []
-#     if color == 'white':
-#         enemies_list=
-#
-#     return moves_list
+
+def check_rook(position, color):
+    moves_list = []
+    if color == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+    for i in range(4):
+        path = True
+        chain = 1
+        if i == 0:
+            x = 0
+            y = 1
+        elif i == 1:
+            x = 0
+            y = -1
+        elif i == 2:
+            x = 1
+            y = 0
+        else:
+            x = -1
+            y = 0
+        while path:
+            if (position[0] + (chain * x), position[1] + (chain * y)) not in friends_list and \
+                    0 <= (position[0] + (chain * x)) <= 7 and 0 <= (position[1] + (chain * y)) <= 7:
+                moves_list.append((position[0] + (chain * x), position[1] + (chain * y)))
+                if (position[0] + (chain * x), position[1] + (chain * y)) in enemies_list:
+                    path = False
+                chain += 1
+            else:
+                path = False
+    return moves_list
 
 
 def check_pawn(position, color):
@@ -180,6 +208,22 @@ def check_pawn(position, color):
             moves_list.append((position[0] + 1, position[1] - 1))
         if (position[0] - 1, position[1] - 1) in white_locations:
             moves_list.append((position[0] - 1, position[1] - 1))
+    return moves_list
+
+
+def check_knight(position, color):
+    moves_list = []
+    if color == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+        target = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
+        for i in range(8):
+            target = (position[0] + target[i][0], position[1] + target[i][1])
+            if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
+                moves_list.append(target)
     return moves_list
 
 
