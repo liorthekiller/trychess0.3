@@ -130,6 +130,7 @@ def check_options(pieces, locations, turn):
     moves_list = []
     all_moves_list = []
     for i in range(len(pieces)):
+        print(i)
         piece_location = locations[i]  # This line is causing the error
         piece = pieces[i]
         if piece == 'pawn':
@@ -147,6 +148,41 @@ def check_options(pieces, locations, turn):
         all_moves_list.append(moves_list)
     return all_moves_list
 
+def check_bishop(position, color):
+    moves_list = []
+    if color == 'white':
+        enemies_list = black_locations
+        friends_list = white_locations
+    else:
+        enemies_list = white_locations
+        friends_list = black_locations
+    for i in range(4):
+        path = True
+        chain = 1
+        if i == 0:
+            x = 1
+            y = -1
+        elif i == 1:
+            x = -1
+            y = -1
+        elif i == 2:
+            x = 1
+            y = 1
+        else:
+            x = -1
+            y = 1
+        while path:
+            if (position[0] + (chain * x ), position[1] + (chain * y)) not in friends_list and \
+                    0 <= position[0] + (chain * x) <= 7 and 0 <= position[1] + (chain * y) <= 7:
+               moves_list.append((position[0]+(chain * x), position[1]+(chain * y)))
+               if(position[0]+(chain * x) ,position[1]+(chain * y)) in enemies_list:
+                  path = False
+               chain += 1
+            else:
+                path = False
+
+
+    return moves_list
 
 def check_rook(position, color):
     moves_list = []
@@ -210,7 +246,6 @@ def check_pawn(position, color):
             moves_list.append((position[0] - 1, position[1] - 1))
     return moves_list
 
-
 def check_knight(position, color):
     moves_list = []
     if color == 'white':
@@ -219,13 +254,17 @@ def check_knight(position, color):
     else:
         enemies_list = white_locations
         friends_list = black_locations
-        target = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
-        for i in range(8):
-            target = (position[0] + target[i][0], position[1] + target[i][1])
-            if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
-                moves_list.append(target)
-    return moves_list
 
+    # Define the target list outside of the loop
+    target = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
+
+    # Use the assignment operator to update moves_list
+    for i in range(8):
+        move_target = (position[0] + target[i][0], position[1] + target[i][1])
+        if move_target not in friends_list and 0 <= move_target[0] <= 7 and 0 <= move_target[1] <= 7:
+            moves_list.append(move_target)
+
+    return moves_list
 
 def check_valid_moves():
     if turn_step < 2:
@@ -270,7 +309,9 @@ while run:
                     if turn_step == 0:
                         turn_step = 1
                 if click_coord in valid_moves and selection != 100:
+                    # change whites coordinates
                     white_locations[selection] = click_coord
+                    # remove eaten black piece
                     if click_coord in black_locations:
                         black_piece = black_locations.index(click_coord)
                         captured_pieces_white.append(black_pieces[black_piece])
@@ -293,7 +334,7 @@ while run:
                         white_piece = white_locations.index(click_coord)
                         captured_pieces_black.append(white_pieces[white_piece])
                         white_pieces.pop(white_piece)
-                        black_locations.pop(white_piece)
+                        white_locations.pop(white_piece)
                     black_options = check_options(black_pieces, black_locations, 'black')
                     white_options = check_options(white_pieces, white_locations, 'white')
                     turn_step = 0
