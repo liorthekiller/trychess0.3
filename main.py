@@ -138,15 +138,16 @@ def check_options(pieces, locations, turn):
         elif piece == 'rook':
             moves_list = check_rook(piece_location, turn)
         elif piece == 'knight':
-            moves_list == check_knight(piece_location, turn)
-        # elif piece == 'bishop':
-        #     moves_list == check_bishop(piece_location, turn)
+            moves_list = check_knight(piece_location, turn)
+        elif piece == 'bishop':
+            moves_list = check_bishop(piece_location, turn)
         # elif piece == 'queen':
-        #     moves_list == check_queen(piece_location, turn)
+        #     moves_list = check_queen(piece_location, turn)
         # elif piece == 'king':
-        #     moves_list == check_king(piece_location, turn)
+        #     moves_list = check_king(piece_location, turn)
         all_moves_list.append(moves_list)
     return all_moves_list
+
 
 def check_bishop(position, color):
     moves_list = []
@@ -172,17 +173,16 @@ def check_bishop(position, color):
             x = -1
             y = 1
         while path:
-            if (position[0] + (chain * x ), position[1] + (chain * y)) not in friends_list and \
-                    0 <= position[0] + (chain * x) <= 7 and 0 <= position[1] + (chain * y) <= 7:
-               moves_list.append((position[0]+(chain * x), position[1]+(chain * y)))
-               if(position[0]+(chain * x) ,position[1]+(chain * y)) in enemies_list:
-                  path = False
-               chain += 1
+            if (position[0] + (chain * x), position[1] + (chain * y)) not in friends_list and \
+                    0 <= (position[0] + (chain * x)) <= 7 and 0 <= (position[1] + (chain * y)) <= 7:
+                moves_list.append((position[0] + (chain * x), position[1] + (chain * y)))
+                if (position[0] + (chain * x), position[1] + (chain * y)) in enemies_list:
+                    path = False
+                chain += 1
             else:
                 path = False
-
-
     return moves_list
+
 
 def check_rook(position, color):
     moves_list = []
@@ -246,6 +246,7 @@ def check_pawn(position, color):
             moves_list.append((position[0] - 1, position[1] - 1))
     return moves_list
 
+
 def check_knight(position, color):
     moves_list = []
     if color == 'white':
@@ -256,15 +257,18 @@ def check_knight(position, color):
         friends_list = black_locations
 
     # Define the target list outside of the loop
-    target = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
+    targets = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
 
-    # Use the assignment operator to update moves_list
-    for i in range(8):
-        move_target = (position[0] + target[i][0], position[1] + target[i][1])
-        if move_target not in friends_list and 0 <= move_target[0] <= 7 and 0 <= move_target[1] <= 7:
-            moves_list.append(move_target)
+    for target in targets:
+        new_position = (position[0] + target[0], position[1] + target[1])
+        # Check if the new position is within the bounds of the chessboard
+        if 0 <= new_position[0] <= 7 and 0 <= new_position[1] <= 7:
+            # Check if the new position is not occupied by a friend
+            if new_position not in friends_list:
+                moves_list.append(new_position)
 
     return moves_list
+
 
 def check_valid_moves():
     if turn_step < 2:
