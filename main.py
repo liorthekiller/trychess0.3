@@ -1,13 +1,27 @@
+import threading
+
 import pygame
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("127.0.0.1", 8888))
+# def receiver():
+#     while True:
+#         try:
+#             print(s.recv(5))
+#         except:
+#             pass
+
 
 pygame.init()
 width = 1000
 height = 900
-screen = pygame.display.set_mode([width, height])
-pygame.display.set_caption('CHESS')
+
+screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+pygame.display.set_caption('CHESS1')
 font = pygame.font.Font('freesansbold.ttf', 20)
 medium_font = pygame.font.Font('freesansbold.ttf', 40)
-big_font = pygame.font.Font('freesansbold.ttf', 50)
+big_font = pygame.font.Font('freesansbold.ttf', 0)
 timer = pygame.time.Clock()
 fps = 60
 white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
@@ -364,6 +378,9 @@ def draw_game_over():
     screen.blit(font.render(f' press ENTER to restart!', True, 'white'), (210, 240))
 
 
+# t = threading.Thread(target=receiver, daemon=True)
+# t.start()
+
 black_options = check_options(black_pieces, black_locations, 'black')
 white_options = check_options(white_pieces, white_locations, 'white')
 run = True
@@ -389,16 +406,23 @@ while run:
             x_coord = event.pos[0] // 100
             y_coord = event.pos[1] // 100
             click_coord = (x_coord, y_coord)
+            s.send(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
+
             if turn_step <= 1:
                 if click_coord == (8, 8) or click_coord == (9, 8):
                     winner = 'black'
                 if click_coord in white_locations:
+                    # white
                     selection = white_locations.index(click_coord)
+                    print(click_coord)
+
                     if turn_step == 0:
                         turn_step = 1
                 if click_coord in valid_moves and selection != 100:
                     # change whites coordinates
                     white_locations[selection] = click_coord
+                    print(click_coord)
+
                     # remove eaten black piece
                     if click_coord in black_locations:
                         black_piece = black_locations.index(click_coord)
@@ -418,11 +442,17 @@ while run:
                 if click_coord == (8, 8) or click_coord == (9, 8):
                     winner = 'white'
                 if click_coord in black_locations:
+                    # black
                     selection = black_locations.index(click_coord)
+                    print(click_coord)
+
                     if turn_step == 2:
                         turn_step = 3
                 if click_coord in valid_moves and selection != 100:
+                    # black
                     black_locations[selection] = click_coord
+                    print(click_coord)
+
                     if click_coord in white_locations:
                         white_piece = white_locations.index(click_coord)
                         captured_pieces_black.append(white_pieces[white_piece])
@@ -446,7 +476,8 @@ while run:
                 black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
                                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
                 black_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
-                                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
+                                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6),
+                                   (6, 6), (7, 6)]
                 captured_pieces_white = []
                 captured_pieces_black = []
                 turn_step = 0
@@ -461,3 +492,4 @@ while run:
 
     pygame.display.flip()
 pygame.quit()
+s.close()
