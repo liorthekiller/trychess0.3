@@ -3,8 +3,12 @@ import threading
 import pygame
 import socket
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("127.0.0.1", 8888))
+from client2 import CLientSocket
+
+connection = CLientSocket()
+click_coord = None
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.connect(("127.0.0.1", 8888))
 # def receiver():
 #     while True:
 #         try:
@@ -405,8 +409,11 @@ while run:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
             x_coord = event.pos[0] // 100
             y_coord = event.pos[1] // 100
+            prev_click_coord = (-1,-1)
+            if click_coord:
+                prev_click_coord = click_coord
             click_coord = (x_coord, y_coord)
-            s.send(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
+            # connection.__send__(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
 
             if turn_step <= 1:
                 if click_coord == (8, 8) or click_coord == (9, 8):
@@ -414,14 +421,15 @@ while run:
                 if click_coord in white_locations:
                     # white
                     selection = white_locations.index(click_coord)
-                    print(click_coord)
+                    print("white",prev_click_coord)
 
                     if turn_step == 0:
                         turn_step = 1
+
                 if click_coord in valid_moves and selection != 100:
                     # change whites coordinates
                     white_locations[selection] = click_coord
-                    print(click_coord)
+                    print("white move to", click_coord)
 
                     # remove eaten black piece
                     if click_coord in black_locations:
@@ -435,6 +443,8 @@ while run:
                     black_options = check_options(black_pieces, black_locations, 'black')
                     white_options = check_options(white_pieces, white_locations, 'white')
                     turn_step = 2
+                    print("turn has changes")
+                    connection.__send__(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
                     selection = 100
                     valid_moves = []
 
@@ -444,16 +454,16 @@ while run:
                 if click_coord in black_locations:
                     # black
                     selection = black_locations.index(click_coord)
-                    print(click_coord)
+                    print("black try:", click_coord)
 
                     if turn_step == 2:
                         turn_step = 3
                 if click_coord in valid_moves and selection != 100:
                     # black
                     black_locations[selection] = click_coord
-                    print(click_coord)
 
                     if click_coord in white_locations:
+
                         white_piece = white_locations.index(click_coord)
                         captured_pieces_black.append(white_pieces[white_piece])
                         if white_pieces[white_piece] == 'king':
@@ -492,4 +502,4 @@ while run:
 
     pygame.display.flip()
 pygame.quit()
-s.close()
+connection.__close__()
