@@ -2,6 +2,7 @@ import threading
 
 import pygame
 import socket
+import pickle
 
 from client2 import CLientSocket
 
@@ -402,6 +403,7 @@ while run:
     if selection != 100:
         valid_moves = check_valid_moves()
         draw_valid(valid_moves)
+    socketstep = []
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -412,6 +414,7 @@ while run:
             prev_click_coord = (-1,-1)
             if click_coord:
                 prev_click_coord = click_coord
+                socketstep.append(prev_click_coord)
             click_coord = (x_coord, y_coord)
             # connection.__send__(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
 
@@ -422,7 +425,6 @@ while run:
                     # white
                     selection = white_locations.index(click_coord)
                     print("white",prev_click_coord)
-
                     if turn_step == 0:
                         turn_step = 1
 
@@ -430,6 +432,8 @@ while run:
                     # change whites coordinates
                     white_locations[selection] = click_coord
                     print("white move to", click_coord)
+                    socketstep.append(click_coord)
+
 
                     # remove eaten black piece
                     if click_coord in black_locations:
@@ -439,6 +443,10 @@ while run:
                             winner = 'white'
                         black_pieces.pop(black_piece)
                         black_locations.pop(black_piece)
+                    data = pickle.dumps(socketstep)
+                    print(pickle.loads(data))
+                    print("smth")
+                    connection.__send__(data)
 
                     black_options = check_options(black_pieces, black_locations, 'black')
                     white_options = check_options(white_pieces, white_locations, 'white')

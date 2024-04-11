@@ -2,6 +2,7 @@ import threading
 
 import pygame
 import socket
+import pickle
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(("127.0.0.1", 8888))
@@ -385,6 +386,8 @@ black_options = check_options(black_pieces, black_locations, 'black')
 white_options = check_options(white_pieces, white_locations, 'white')
 run = True
 while run:
+    # res = s.recv(16)
+    # print(pickle.dumps(res))
     timer.tick(fps)
     if counter < 30:
         counter += 1

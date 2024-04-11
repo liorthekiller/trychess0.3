@@ -1,5 +1,5 @@
 import socket
-
+import pickle
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -13,9 +13,19 @@ print(client_2_addr)
 
 while True:
     res = client_1.recv(16)
-    print(res)
+    # print(res)
+    try:
+        print(pickle.loads(res))
+    except:
+        print("Failed to read")
+
     client_2.send(res)
 
     res = client_2.recv(16)
-    print(res)
+    # print(res)
+    try:
+        print(pickle.loads(res))
+    except:
+        print("Failed to read")
+
     client_1.send(res)
