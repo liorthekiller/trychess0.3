@@ -4,8 +4,11 @@ import pygame
 import socket
 import pickle
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("127.0.0.1", 8888))
+from client2 import CLientSocket
+
+connection = CLientSocket()
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.connect(("127.0.0.1", 8888))
 # def receiver():
 #     while True:
 #         try:
@@ -409,7 +412,9 @@ while run:
             x_coord = event.pos[0] // 100
             y_coord = event.pos[1] // 100
             click_coord = (x_coord, y_coord)
-            s.send(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
+            # connection.__send__(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
+            connection.__send__(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
+
 
             if turn_step <= 1:
                 if click_coord == (8, 8) or click_coord == (9, 8):
@@ -495,4 +500,4 @@ while run:
 
     pygame.display.flip()
 pygame.quit()
-s.close()
+connection.__close__()

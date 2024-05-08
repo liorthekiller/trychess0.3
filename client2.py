@@ -15,7 +15,19 @@ class CLientSocket:
     def __receive__(self):
         while True:
             message = self.my_socket.recv(16).decode('utf-8')
+
+            # command = getcommand
+            #
+            # if(command == "start"):
+            # role = role that you get from server
+            #
+            # if(command == "new-move"):
+
+
+
+            #when first starting up, client gets here if he is black or white and builds the board accordingly
             print(message)
+
             if message[0] == 2:
                 print("white move", message)
 

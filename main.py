@@ -1,5 +1,4 @@
 import threading
-
 import pygame
 import socket
 import pickle
@@ -18,6 +17,7 @@ click_coord = None
 #             pass
 
 
+#def init that contains all the initiialization of the gui of the chess
 pygame.init()
 width = 1000
 height = 900
@@ -29,13 +29,26 @@ medium_font = pygame.font.Font('freesansbold.ttf', 40)
 big_font = pygame.font.Font('freesansbold.ttf', 0)
 timer = pygame.time.Clock()
 fps = 60
-white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+
+
+
+
+# white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+#                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+
+pieces_list = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-white_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
+
+white_pieces = pieces_list.copy()
+black_pieces = pieces_list.copy()
+
+#role = get role from connection somehow
+
+black_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
                    (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
-black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
-                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-black_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
+# black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+#                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+white_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
                    (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
 captured_pieces_white = []
 captured_pieces_black = []
@@ -126,29 +139,48 @@ def draw_board():
             pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
         screen.blit(medium_font.render('GIVE UP', True, 'black'), (810, 830))
 
-
-def draw_pieces():
-    for i in range(len(white_pieces)):
-        index = piece_list.index(white_pieces[i])
-        if white_pieces[i] == 'pawn':
-            screen.blit(white_pawn, (white_locations[i][0] * 100 + 22, white_locations[i][1] * 100 + 30))
+def draw_opponent_pieces(pieces, locations, pawn_image, pieces_images):
+    for i in range(len(pieces)):
+        index = piece_list.index(pieces[i])
+        if pieces[i] == 'pawn':
+            screen.blit(pawn_image, (locations[i][0] * 100 + 22, locations[i][1] * 100 + 30))
         else:
-            screen.blit(white_images[index], (white_locations[i][0] * 100 + 10, white_locations[i][1] * 100 + 10))
+            screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
         if turn_step < 2:
             if selection == i:
                 pygame.draw.rect(screen, 'red',
-                                 (white_locations[i][0] * 100 + 1, white_locations[i][1] * 100 + 1, 100, 100), 2)
+                                 (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1, 100, 100), 2)
 
-    for i in range(len(black_pieces)):
-        index = piece_list.index(black_pieces[i])
-        if black_pieces[i] == 'pawn':
-            screen.blit(black_pawn, (black_locations[i][0] * 100 + 22, black_locations[i][1] * 100 + 30))
+def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
+    for i in range(len(pieces)):
+        index = piece_list.index(pieces[i])
+        if pieces[i] == 'pawn':
+            screen.blit(pawn_image, (locations[i][0] * 100 + 22, locations[i][1] * 100 + 30))
         else:
-            screen.blit(black_images[index], (black_locations[i][0] * 100 + 10, black_locations[i][1] * 100 + 10))
+            screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
         if turn_step >= 2:
             if selection == i:
-                pygame.draw.rect(screen, 'blue', (black_locations[i][0] * 100 + 1, black_locations[i][1] * 100 + 1,
+                pygame.draw.rect(screen, 'blue', (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1,
                                                   100, 100), 2)
+
+def draw_pieces():
+
+    # draw_opponent_pieces(white_pieces, white_locations, white_pawn, white_images)
+    #based on role
+    draw_player_pieces(white_pieces, white_locations, white_pawn, white_images)
+    draw_opponent_pieces(black_pieces, black_locations, black_pawn, black_images)
+    # draw_player_pieces(black_pieces, black_locations, black_pawn, black_images)
+
+    # for i in range(len(black_pieces)):
+    #     index = piece_list.index(black_pieces[i])
+    #     if black_pieces[i] == 'pawn':
+    #         screen.blit(black_pawn, (black_locations[i][0] * 100 + 22, black_locations[i][1] * 100 + 30))
+    #     else:
+    #         screen.blit(black_images[index], (black_locations[i][0] * 100 + 10, black_locations[i][1] * 100 + 10))
+    #     if turn_step >= 2:
+    #         if selection == i:
+    #             pygame.draw.rect(screen, 'blue', (black_locations[i][0] * 100 + 1, black_locations[i][1] * 100 + 1,
+    #                                               100, 100), 2)
 
 
 def check_options(pieces, locations, turn):
