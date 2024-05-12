@@ -1,12 +1,12 @@
 import pygame
 import pickle
-
+from time import sleep
 from clientSocket import ClientSocket
 
 connection = ClientSocket()
 click_coord = None
 
-#def init that contains all the initiialization of the gui of the chess
+# def init that contains all the initialization of the gui of the chess
 pygame.init()
 width = 1000
 height = 900
@@ -19,29 +19,29 @@ timer = pygame.time.Clock()
 fps = 60
 
 pieces_list = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
-                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+               'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
 
 white_pieces = pieces_list.copy()
 black_pieces = pieces_list.copy()
 
-#role = get role from connection somehow
 opponent_pieces_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
-                   (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+                             (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
 
 player_pieces_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
-                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
+                           (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
 
-black_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
-                   (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+captured_pieces_white = captured_pieces_black = valid_moves = []
 
-white_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
-                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
-captured_pieces_white = []
-captured_pieces_black = []
+while connection.player_role == -1:
+    sleep(1)
+
+if connection.player_role == "0":
+    white_locations, black_locations = player_pieces_locations, opponent_pieces_locations
+else:
+    black_locations, white_locations = player_pieces_locations, opponent_pieces_locations
 
 turn_step = 0
 selection = 100
-valid_moves = []
 
 black_rook = pygame.image.load('sprites/b.rook.png')
 black_rook = pygame.transform.scale(black_rook, (80, 80))
@@ -125,6 +125,7 @@ def draw_board():
             pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
         screen.blit(medium_font.render('GIVE UP', True, 'black'), (810, 830))
 
+
 def draw_opponent_pieces(pieces, locations, pawn_image, pieces_images):
     for i in range(len(pieces)):
         index = piece_list.index(pieces[i])
@@ -136,6 +137,7 @@ def draw_opponent_pieces(pieces, locations, pawn_image, pieces_images):
             if selection == i:
                 pygame.draw.rect(screen, 'red',
                                  (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1, 100, 100), 2)
+
 
 def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
     for i in range(len(pieces)):
@@ -149,24 +151,15 @@ def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
                 pygame.draw.rect(screen, 'blue', (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1,
                                                   100, 100), 2)
 
+
 def draw_pieces():
-
-    # draw_opponent_pieces(white_pieces, white_locations, white_pawn, white_images)
-    #based on role
-    draw_player_pieces(white_pieces, white_locations, white_pawn, white_images)
-    draw_opponent_pieces(black_pieces, black_locations, black_pawn, black_images)
-    # draw_player_pieces(black_pieces, black_locations, black_pawn, black_images)
-
-    # for i in range(len(black_pieces)):
-    #     index = piece_list.index(black_pieces[i])
-    #     if black_pieces[i] == 'pawn':
-    #         screen.blit(black_pawn, (black_locations[i][0] * 100 + 22, black_locations[i][1] * 100 + 30))
-    #     else:
-    #         screen.blit(black_images[index], (black_locations[i][0] * 100 + 10, black_locations[i][1] * 100 + 10))
-    #     if turn_step >= 2:
-    #         if selection == i:
-    #             pygame.draw.rect(screen, 'blue', (black_locations[i][0] * 100 + 1, black_locations[i][1] * 100 + 1,
-    #                                               100, 100), 2)
+    # draws the pieces based on role
+    if connection.player_role == "0":
+        draw_player_pieces(white_pieces, white_locations, white_pawn, white_images)
+        draw_opponent_pieces(black_pieces, black_locations, black_pawn, black_images)
+    else:
+        draw_player_pieces(black_pieces, black_locations, black_pawn, black_images)
+        draw_opponent_pieces(white_pieces, white_locations, white_pawn, white_images)
 
 
 def check_options(pieces, locations, turn):
@@ -429,7 +422,7 @@ while run:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
             x_coord = event.pos[0] // 100
             y_coord = event.pos[1] // 100
-            prev_click_coord = (-1,-1)
+            prev_click_coord = (-1, -1)
             if click_coord:
                 prev_click_coord = click_coord
                 socketstep.append(prev_click_coord)
@@ -442,7 +435,7 @@ while run:
                 if click_coord in white_locations:
                     # white
                     selection = white_locations.index(click_coord)
-                    print("white",prev_click_coord)
+                    print("white", prev_click_coord)
                     if turn_step == 0:
                         turn_step = 1
 
@@ -451,7 +444,6 @@ while run:
                     white_locations[selection] = click_coord
                     print("white move to", click_coord)
                     socketstep.append(click_coord)
-
 
                     # remove eaten black piece
                     if click_coord in black_locations:
@@ -504,7 +496,7 @@ while run:
         if event.type == pygame.KEYDOWN and game_over:
             if event.key == pygame.K_RETURN:
                 game_over = False
-                winner =''
+                winner = ''
                 white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
                                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
                 white_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),

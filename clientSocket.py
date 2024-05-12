@@ -20,6 +20,7 @@ class ClientSocket:
     def __init__(self):
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect(("127.0.0.1", 8888))
+        self.player_role = -1
         clientThread = threading.Thread(target=self.__receive__)
         clientThread.start()
 
