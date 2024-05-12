@@ -1,27 +1,15 @@
-import threading
 import pygame
-import socket
 import pickle
 
-from client2 import CLientSocket
+from clientSocket import ClientSocket
 
-connection = CLientSocket()
+connection = ClientSocket()
 click_coord = None
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# s.connect(("127.0.0.1", 8888))
-# def receiver():
-#     while True:
-#         try:
-#             print(s.recv(5))
-#         except:
-#             pass
-
 
 #def init that contains all the initiialization of the gui of the chess
 pygame.init()
 width = 1000
 height = 900
-
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('CHESS1')
 font = pygame.font.Font('freesansbold.ttf', 20)
@@ -30,12 +18,6 @@ big_font = pygame.font.Font('freesansbold.ttf', 0)
 timer = pygame.time.Clock()
 fps = 60
 
-
-
-
-# white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
-#                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-
 pieces_list = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
 
@@ -43,11 +25,15 @@ white_pieces = pieces_list.copy()
 black_pieces = pieces_list.copy()
 
 #role = get role from connection somehow
+opponent_pieces_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
+                   (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+
+player_pieces_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
+                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
 
 black_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
                    (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
-# black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
-#                 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+
 white_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
                    (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
 captured_pieces_white = []

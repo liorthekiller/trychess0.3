@@ -4,9 +4,9 @@ import pygame
 import socket
 import pickle
 
-from client2 import CLientSocket
+from clientSocket import ClientSocket
 
-connection = CLientSocket()
+connection = ClientSocket()
 # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # s.connect(("127.0.0.1", 8888))
 # def receiver():

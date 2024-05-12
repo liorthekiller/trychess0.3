@@ -14,6 +14,7 @@ print(client_2_addr)
 # client_1.send("0".encode())
 # client_2.send("1".encode())
 
+# 0 is white, 1 is black
 role_1 = 0
 role_2 = 0
 flip = random.randint(0, 1)
@@ -22,10 +23,10 @@ if flip == 0:
 else:
     role_2 = 1
 
-print('command:"start", role:%d' % role_1)
+print('command:start, role:%d' % role_1)
 
-client_1.send(('command:"start", role:"%d"' % role_1).encode())
-client_2.send(('command:"start", role:"%d"' % role_2).encode())
+client_1.send(('command:start, role:%d' % role_1).encode())
+client_2.send(('command:start, role:%d' % role_2).encode())
 # client_1.send('black'.encode())
 # client_2.send('white'.encode())
 
