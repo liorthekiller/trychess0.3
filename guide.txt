@@ -1,0 +1,11 @@
+turn_step :
+0 - white chooses figure to play
+1 - white plays the chosen figure
+2 - black chooses figure 
+3 - black plays the chosen figure
+
+
+what needs to be done 
+synchronize the two clients - the moves on both should look the same 
+so in details: 
+when doing a move sending a message to the server, the other client should get it trough the server and render the move 
