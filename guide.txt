@@ -9,3 +9,11 @@ what needs to be done
 synchronize the two clients - the moves on both should look the same 
 so in details: 
 when doing a move sending a message to the server, the other client should get it trough the server and render the move 
+
+**what are the most urgent problems now and how to fix them**
+1. most important - fix the sync of the moves, the moves are already being sent and we can handle them BUT the issue is that because the 
+board and the pieces use the same numbers system (1,7) etc for example, in both sides, when i send a move and say that i moved a white piece
+from (1,7) to (2,7) to client2 his two lists of pieces are the opposite of mine, so he will not even have a white piece in (1,7) - so we need to 
+somehow convert those moves so that they have the same meaning on both sides. 
+2. right now we can only move the horses and play with them basically, because of the hardcoded moving options - we need to fix those (so that 
+pawns and other pieces know the directions they are allowed to move) 
