@@ -285,29 +285,58 @@ def check_rook(position, color):
 
 def check_pawn(position, color):
     moves_list = []
-    if color == 'white':
-        if (position[0], position[1] + 1) not in white_locations and \
-                (position[0], position[1] + 1) not in black_locations and position[1] < 7:
-            moves_list.append((position[0], position[1] + 1))
-        if (position[0], position[1] + 2) not in white_locations and \
-                (position[0], position[1] + 2) not in black_locations and position[1] == 1:
-            moves_list.append((position[0], position[1] + 2))
-        if (position[0] + 1, position[1] + 1) in black_locations:
-            moves_list.append((position[0] + 1, position[1] + 1))
-        if (position[0] - 1, position[1] + 1) in black_locations:
-            moves_list.append((position[0] - 1, position[1] + 1))
+    if connection.player_role == "0":
+        print('I AM WHITE ')
+        if color == 'black':
+            if (position[0], position[1] + 1) not in white_locations and \
+                    (position[0], position[1] + 1) not in black_locations and position[1] < 7:
+                moves_list.append((position[0], position[1] + 1))
+            if (position[0], position[1] + 2) not in white_locations and \
+                    (position[0], position[1] + 2) not in black_locations and position[1] == 1:
+                moves_list.append((position[0], position[1] + 2))
+            if (position[0] + 1, position[1] + 1) in black_locations:
+                moves_list.append((position[0] + 1, position[1] + 1))
+            if (position[0] - 1, position[1] + 1) in black_locations:
+                moves_list.append((position[0] - 1, position[1] + 1))
 
-    if color == 'black':
-        if (position[0], position[1] - 1) not in white_locations and \
-                (position[0], position[1] - 1) not in black_locations and position[1] > 0:
-            moves_list.append((position[0], position[1] - 1))
-        if (position[0], position[1] - 2) not in white_locations and \
-                (position[0], position[1] - 2) not in black_locations and position[1] == 6:
-            moves_list.append((position[0], position[1] - 2))
-        if (position[0] + 1, position[1] - 1) in white_locations:
-            moves_list.append((position[0] + 1, position[1] - 1))
-        if (position[0] - 1, position[1] - 1) in white_locations:
-            moves_list.append((position[0] - 1, position[1] - 1))
+        if color == 'white':
+            if (position[0], position[1] - 1) not in white_locations and \
+                    (position[0], position[1] - 1) not in black_locations and position[1] > 0:
+                moves_list.append((position[0], position[1] - 1))
+            if (position[0], position[1] - 2) not in white_locations and \
+                    (position[0], position[1] - 2) not in black_locations and position[1] == 6:
+                moves_list.append((position[0], position[1] - 2))
+            if (position[0] + 1, position[1] - 1) in white_locations:
+                moves_list.append((position[0] + 1, position[1] - 1))
+            if (position[0] - 1, position[1] - 1) in white_locations:
+                moves_list.append((position[0] - 1, position[1] - 1))
+    else:
+
+        print('I AM black ')
+
+        if color == 'white':
+            if (position[0], position[1] + 1) not in white_locations and \
+                    (position[0], position[1] + 1) not in black_locations and position[1] < 7:
+                moves_list.append((position[0], position[1] + 1))
+            if (position[0], position[1] + 2) not in white_locations and \
+                    (position[0], position[1] + 2) not in black_locations and position[1] == 1:
+                moves_list.append((position[0], position[1] + 2))
+            if (position[0] + 1, position[1] + 1) in black_locations:
+                moves_list.append((position[0] + 1, position[1] + 1))
+            if (position[0] - 1, position[1] + 1) in black_locations:
+                moves_list.append((position[0] - 1, position[1] + 1))
+
+        if color == 'black':
+            if (position[0], position[1] - 1) not in white_locations and \
+                    (position[0], position[1] - 1) not in black_locations and position[1] > 0:
+                moves_list.append((position[0], position[1] - 1))
+            if (position[0], position[1] - 2) not in white_locations and \
+                    (position[0], position[1] - 2) not in black_locations and position[1] == 6:
+                moves_list.append((position[0], position[1] - 2))
+            if (position[0] + 1, position[1] - 1) in white_locations:
+                moves_list.append((position[0] + 1, position[1] - 1))
+            if (position[0] - 1, position[1] - 1) in white_locations:
+                moves_list.append((position[0] - 1, position[1] - 1))
     return moves_list
 
 
@@ -408,7 +437,7 @@ def mirrorMove(move):
 # gets coord and returns a mirror of it, for example for (0, 0) will return (7, 7), (1, 0) -> (6, 7)
 # (3, 3) -> (4, 4), (4, 3) -> (3, 4), (1, 2) -> (6, 5)
 def mirrorCoord(coord):
-    new_coord = (7 - coord[0], 7 - coord[1])
+    new_coord = (coord[0], 7 - coord[1])
     return new_coord
 
 
@@ -436,11 +465,7 @@ while run:
     if selection != 100:
         valid_moves = check_valid_moves()
         draw_valid(valid_moves)
-        print("selection 100")
 
-    print("socketstep")
-    print("turn step")
-    print(turn_step)
     socketstep = []
 
     # the actual handling of the players move
