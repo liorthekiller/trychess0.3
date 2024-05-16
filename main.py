@@ -396,6 +396,22 @@ def draw_game_over():
     screen.blit(font.render(f' press ENTER to restart!', True, 'white'), (210, 240))
 
 
+# gets a move and returns the mirror of it
+def mirrorMove(move):
+    new_move = []
+    for coord in move:
+        new_move.append(mirrorCoord(coord))
+
+    return new_move
+
+
+# gets coord and returns a mirror of it, for example for (0, 0) will return (7, 7), (1, 0) -> (6, 7)
+# (3, 3) -> (4, 4), (4, 3) -> (3, 4), (1, 2) -> (6, 5)
+def mirrorCoord(coord):
+    new_coord = (7 - coord[0], 7 - coord[1])
+    return new_coord
+
+
 # t = threading.Thread(target=receiver, daemon=True)
 # t.start()
 
@@ -420,6 +436,11 @@ while run:
     if selection != 100:
         valid_moves = check_valid_moves()
         draw_valid(valid_moves)
+        print("selection 100")
+
+    print("socketstep")
+    print("turn step")
+    print(turn_step)
     socketstep = []
 
     # the actual handling of the players move
@@ -457,13 +478,13 @@ while run:
 
                     move_to_coord = (int(move_to.split(", ")[0]), int(move_to.split(", ")[1].split(")")[0]))
                     # change whites coordinates
-                    white_locations[selection] = click_coord
-                    print("white move to", click_coord)
-                    socketstep.append(click_coord)
+                    white_locations[selection] = move_to_coord
+                    print("white move to", move_to_coord)
+                    socketstep.append(move_to_coord)
 
                     # remove eaten black piece
-                    if click_coord in black_locations:
-                        black_piece = black_locations.index(click_coord)
+                    if move_to_coord in black_locations:
+                        black_piece = black_locations.index(move_to_coord)
                         captured_pieces_white.append(black_pieces[black_piece])
                         if black_pieces[black_piece] == 'king':
                             winner = 'white'
@@ -484,9 +505,7 @@ while run:
                     valid_moves = []
                     connection.new_move[0] = -1
 
-
                 else:
-
                     if click_coord == (8, 8) or click_coord == (9, 8):
                         winner = 'black'
                     if click_coord in white_locations:
@@ -511,7 +530,10 @@ while run:
                             black_pieces.pop(black_piece)
                             black_locations.pop(black_piece)
 
-                        data = pickle.dumps(socketstep)
+                        print('white step:')
+                        print(socketstep)
+                        # data = pickle.dumps(socketstep)
+                        data = pickle.dumps(mirrorMove(socketstep))
 
                         # connection.__send__(pickle.dumps([(1, 0), (2, 0)]))
                         connection.__send__(data)
@@ -534,10 +556,49 @@ while run:
                     while connection.new_move[0] == -1:
                         sleep(1)
 
-                    # gets the new move from server, needs to render to board accordingly to new move and change its status back to -1
-                    print('got new move:%s' % connection.new_move[1])
+                    print('new move')
+                    print(connection.new_move)
 
-                    #handling like the handle of the white pieces above
+                    # gets the new move from server, needs to render to board accordingly
+                    # to new move and change its status back to -1
+                    move = connection.new_move[1]
+                    print('got new move:%s' % move)
+                    moves = move.split("), (")
+                    move_from, move_to = moves[0], moves[1]
+
+                    move_from_coord = (int(move_from.split(", ")[0].split("(")[1]), int(move_from.split(", ")[1]))
+                    selection = black_locations.index(move_from_coord)
+                    print("black", prev_click_coord)
+                    if turn_step == 2:
+                        turn_step = 3
+
+                    move_to_coord = (int(move_to.split(", ")[0]), int(move_to.split(", ")[1].split(")")[0]))
+                    # change black coordinates
+                    black_locations[selection] = move_to_coord
+                    print("black move to", move_to_coord)
+                    socketstep.append(move_to_coord)
+
+                    # remove eaten white piece
+                    if move_to_coord in white_locations:
+                        white_piece = white_locations.index(move_to_coord)
+                        captured_pieces_black.append(white_pieces[white_piece])
+                        if white_pieces[white_piece] == 'king':
+                            winner = 'white'
+                        white_pieces.pop(white_piece)
+                        white_locations.pop(white_piece)
+
+                    # data = pickle.dumps(socketstep)
+                    # connection.__send__(data)
+                    # print(pickle.loads(data))
+                    # print("move sent to server")
+
+                    black_options = check_options(black_pieces, black_locations, 'black')
+                    white_options = check_options(white_pieces, white_locations, 'white')
+                    turn_step = 0
+
+                    # connection.__send__(f"({turn_step},{click_coord[0]},{click_coord[1]})".encode())
+                    selection = 100
+                    valid_moves = []
                     connection.new_move[0] = -1
                 else:
                     if click_coord == (8, 8) or click_coord == (9, 8):
@@ -552,6 +613,8 @@ while run:
                     if click_coord in valid_moves and selection != 100:
                         # black
                         black_locations[selection] = click_coord
+                        print("black move to", click_coord)
+                        socketstep.append(click_coord)
 
                         if click_coord in white_locations:
 
@@ -562,7 +625,10 @@ while run:
                             white_pieces.pop(white_piece)
                             white_locations.pop(white_piece)
 
-                        data = pickle.dumps(socketstep)
+                        print('black step:')
+                        print(socketstep)
+                        data = pickle.dumps(mirrorMove(socketstep))
+                        # data = pickle.dumps(socketstep)
                         connection.__send__(data)
                         print(pickle.loads(data))
                         print("move sent to server")

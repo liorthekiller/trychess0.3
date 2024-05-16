@@ -65,6 +65,7 @@ while True:
         # send client 1 the turn
         # and move the turn to him
         client_1.send(('command:new_move; move:%s' % move).encode())
+        print('move sent to client1:%s' % move)
         turn_of = 1
 
     # res = client_1.recv(1024)
