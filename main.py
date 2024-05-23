@@ -135,10 +135,10 @@ def draw_opponent_pieces(pieces, locations, pawn_image, pieces_images):
             screen.blit(pawn_image, (locations[i][0] * 100 + 22, locations[i][1] * 100 + 30))
         else:
             screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
-        if turn_step < 2:
-            if selection == i:
-                pygame.draw.rect(screen, 'red',
-                                 (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1, 100, 100), 2)
+        # if turn_step < 2:
+        #     if selection == i:
+        #         pygame.draw.rect(screen, 'red',
+        #                          (locations[i][0] * 100 - 1, locations[i][1] * 100 - 1, 100, 100), 2)
 
 
 def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
@@ -148,8 +148,8 @@ def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
             screen.blit(pawn_image, (locations[i][0] * 100 + 22, locations[i][1] * 100 + 30))
         else:
             screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
-        if turn_step >= 2:
-            if selection == i:
+
+        if selection == i:
                 pygame.draw.rect(screen, 'blue', (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1,
                                                   100, 100), 2)
 
@@ -190,10 +190,9 @@ def check_options(pieces, locations, turn):
 def check_king(position, color):
     moves_list = []
     if color == 'white':
-        enemies_list = black_locations
+
         friends_list = white_locations
     else:
-        enemies_list = white_locations
         friends_list = black_locations
 
     targets = [(1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1), (0, 1), (0, -1)]
@@ -343,10 +342,8 @@ def check_pawn(position, color):
 def check_knight(position, color):
     moves_list = []
     if color == 'white':
-        enemies_list = black_locations
         friends_list = white_locations
     else:
-        enemies_list = white_locations
         friends_list = black_locations
 
     # Define the target list outside the loop
@@ -469,9 +466,10 @@ while run:
     socketstep = []
 
     # got new move from server
-    if (connection.new_move[0] == 1):
+    if connection.new_move[0] == 1:
         if connection.player_role != "0":
-            # gets the new move from server, needs to render to board accordingly to new move and change its status back to -1
+            # gets the new move from server, needs to render to board accordingly to new move and change its status
+            # back to -1
             move = connection.new_move[1]
             print('got new move:%s' % move)
             moves = move.split("), (")
@@ -576,7 +574,8 @@ while run:
                     while connection.new_move[0] == -1:
                         sleep(1)
 
-                    # gets the new move from server, needs to render to board accordingly to new move and change its status back to -1
+                    # gets the new move from server, needs to render to board accordingly to new move and change its
+                    # status back to -1
                     move = connection.new_move[1]
                     print('got new move:%s' % move)
                     moves = move.split("), (")

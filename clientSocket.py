@@ -19,7 +19,7 @@ def get_value_of_key(message, key):
 class ClientSocket:
     def __init__(self):
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.my_socket.connect(("127.0.0.1", 8888))
+        self.my_socket.connect(("192.168.198.70", 8888))
         self.player_role = -1
         # the new move attribute gets 1 in the first index when is updated, when the update is rendered it goes back to -1,
         # the second index (1) is for the move itself

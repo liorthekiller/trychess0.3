@@ -4,7 +4,7 @@ import random
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server.bind(("127.0.0.1", 8888))
+server.bind(("192.168.198.70", 8888))
 server.listen(10)
 
 client_1, client_1_addr = server.accept()
