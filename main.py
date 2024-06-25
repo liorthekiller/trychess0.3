@@ -150,8 +150,8 @@ def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
             screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
 
         if selection == i:
-                pygame.draw.rect(screen, 'blue', (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1,
-                                                  100, 100), 2)
+            pygame.draw.rect(screen, 'blue', (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1,
+                                              100, 100), 2)
 
 
 def draw_pieces():
@@ -412,10 +412,19 @@ def draw_check():
                                                                black_locations[king_index][1] * 100 + 1, 100, 100], 5)
 
 
+def is_can_restart():
+    return (winner == 'white' and connection.player_role == '1') or (
+            winner == 'black' and connection.player_role == '0')
+
+
 def draw_game_over():
     pygame.draw.rect(screen, 'black', (200, 200, 400, 70))
     screen.blit(font.render(f'{winner} won the game!', True, 'white'), (210, 210))
-    screen.blit(font.render(f' press ENTER to restart!', True, 'white'), (210, 240))
+
+    if is_can_restart():
+        screen.blit(font.render(f'press ENTER to restart!', True, 'white'), (210, 240))
+    else:
+        screen.blit(font.render(f'please wait for your opponent to restart', True, 'white'), (210, 240))
 
 
 # gets a move and returns the mirror of it
@@ -431,6 +440,7 @@ def mirrorMove(move):
 def mirrorCoord(coord):
     new_coord = (coord[0], 7 - coord[1])
     return new_coord
+
 
 black_options = check_options(black_pieces, black_locations, 'black')
 white_options = check_options(white_pieces, white_locations, 'white')
@@ -456,10 +466,9 @@ while run:
 
     socketstep = []
 
-    print("waiting for new moves")
-
     # got new move from server
     if connection.new_move[0] == 1:
+        print("i got a move from my opponent")
         if connection.player_role != "0":
             # gets the new move from server, needs to render to board accordingly to new move and change its status
             # back to -1
@@ -526,7 +535,7 @@ while run:
                 white_piece = white_locations.index(move_to_coord)
                 captured_pieces_black.append(white_pieces[white_piece])
                 if white_pieces[white_piece] == 'king':
-                    winner = 'white'
+                    winner = 'black'
                 white_pieces.pop(white_piece)
                 white_locations.pop(white_piece)
 
@@ -537,9 +546,39 @@ while run:
             valid_moves = []
             connection.new_move[0] = -1
 
+    # got new move from server
+    if connection.new_move[0] == 2:
+        print("i got a command to restart the game")
+        # RESTART GAME
+        game_over = False
+        winner = ''
+        counter = 0
+
+        white_pieces = pieces_list.copy()
+        black_pieces = pieces_list.copy()
+
+        opponent_pieces_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
+                                     (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+
+        player_pieces_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
+                                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
+
+        if connection.player_role == "0":
+            white_locations, black_locations = player_pieces_locations, opponent_pieces_locations
+        else:
+            black_locations, white_locations = player_pieces_locations, opponent_pieces_locations
+
+        captured_pieces_white = []
+        captured_pieces_black = []
+        turn_step = 0
+        selection = 100
+        valid_moves = []
+        black_options = check_options(black_pieces, black_locations, 'black')
+        white_options = check_options(white_pieces, white_locations, 'white')
+        connection.new_move[0] = -1
+
     # the actual handling of the players move
     for event in pygame.event.get():
-
         if event.type == pygame.QUIT:
             run = False
 
@@ -559,13 +598,15 @@ while run:
                 # if the players role is black, he just waits for a message from the server
                 if connection.player_role != "0":
                     while connection.new_move[0] == -1:
-                        print("waiting for new move")
+                        print("white move, im black waiting for new move")
                         sleep(1)
 
                     # gets the new move from server, needs to render to board accordingly to new move and change its
                     # status back to -1
                     move = connection.new_move[1]
                     print('got new move:%s' % move)
+                    if move == "end_game": break
+                    print("not broke")
                     moves = move.split("), (")
                     move_from, move_to = moves[0], moves[1]
 
@@ -645,7 +686,7 @@ while run:
                 # if the players role is white, he just waits for a message from the server
                 if connection.player_role == "0":
                     while connection.new_move[0] == -1:
-                        print("waiting for new move")
+                        print("black move im white waiting for new move")
                         sleep(1)
 
                     print('new move')
@@ -655,6 +696,8 @@ while run:
                     # to new move and change its status back to -1
                     move = connection.new_move[1]
                     print('got new move:%s' % move)
+                    if move == "end_game": break
+                    print("not broke")
                     moves = move.split("), (")
                     move_from, move_to = moves[0], moves[1]
 
@@ -676,7 +719,7 @@ while run:
                         captured_pieces_black.append(white_pieces[white_piece])
 
                         if white_pieces[white_piece] == 'king':
-                            winner = 'white'
+                            winner = 'black'
 
                         white_pieces.pop(white_piece)
                         white_locations.pop(white_piece)
@@ -725,7 +768,7 @@ while run:
                         selection = 100
                         valid_moves = []
 
-        if event.type == pygame.KEYDOWN and game_over:
+        if event.type == pygame.KEYDOWN and game_over and is_can_restart():
             if event.key == pygame.K_RETURN:
 
                 # RESTART GAME
@@ -754,9 +797,7 @@ while run:
                 valid_moves = []
                 black_options = check_options(black_pieces, black_locations, 'black')
                 white_options = check_options(white_pieces, white_locations, 'white')
-
-
-                # if its your turn, send message to server, if not
+                print("I want to restart game")
                 connection.__send__(pickle.dumps("end_game"))
 
     if winner != '':
