@@ -39,7 +39,8 @@ class ClientSocket:
         if command == "start":
             self.player_role = get_value_of_key(message, "role:")
         elif command == "new_move":
-            self.new_move = [1, get_value_of_key(message, "move:")]
+            key = 1 if get_value_of_key(message, "move:") != "end_game" else 2
+            self.new_move = [key, get_value_of_key(message, "move:")]
 
         if message[0] == 2:
             print("white move", message)
