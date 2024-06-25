@@ -456,6 +456,8 @@ while run:
 
     socketstep = []
 
+    print("waiting for new moves")
+
     # got new move from server
     if connection.new_move[0] == 1:
         if connection.player_role != "0":
@@ -725,8 +727,11 @@ while run:
 
         if event.type == pygame.KEYDOWN and game_over:
             if event.key == pygame.K_RETURN:
+
+                # RESTART GAME
                 game_over = False
                 winner = ''
+                counter = 0
 
                 white_pieces = pieces_list.copy()
                 black_pieces = pieces_list.copy()
@@ -750,8 +755,9 @@ while run:
                 black_options = check_options(black_pieces, black_locations, 'black')
                 white_options = check_options(white_pieces, white_locations, 'white')
 
+
                 # if its your turn, send message to server, if not
-                # connection.__send__(pickle.dumps("end_game"))
+                connection.__send__(pickle.dumps("end_game"))
 
     if winner != '':
         game_over = True

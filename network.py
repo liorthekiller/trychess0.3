@@ -4,7 +4,7 @@ import random
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server.bind(("192.168.198.70", 8888))
+server.bind(("0.0.0.0", 8888))
 server.listen(10)
 
 client_1, client_1_addr = server.accept()
@@ -45,6 +45,8 @@ while True:
         except:
             print("Failed to read")
 
+        #if game over - restart
+
         # send client 2 the turn
         # and move the turn to him
 
@@ -62,26 +64,10 @@ while True:
         except:
             print("Failed to read")
 
+        # if game over - restart
+
         # send client 1 the turn
         # and move the turn to him
         client_1.send(('command:new_move; move:%s' % move).encode())
         print('move sent to client1:%s' % move)
         turn_of = 1
-
-    # res = client_1.recv(1024)
-    # # print(res)
-    # try:
-    #     print(pickle.loads(res))
-    # except:
-    #     print("Failed to read")
-    #
-    # client_2.send(res)
-    #
-    # res = client_2.recv(1024)
-    # # print(res)
-    # try:
-    #     print(pickle.loads(res))
-    # except:
-    #     print("Failed to read")
-    #
-    # client_1.send(res)
