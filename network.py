@@ -16,6 +16,7 @@ print(client_2_addr)
 role_1 = 0
 role_2 = 0
 flip = random.randint(0, 1)
+
 if flip == 0:
     role_1 = 1
 else:
@@ -26,15 +27,15 @@ print('command:start; role:%d' % role_1)
 client_1.send(('command:start; role:%d' % role_1).encode())
 client_2.send(('command:start; role:%d' % role_2).encode())
 
-if (role_1 == 0):
+if role_1 == 0:
     turn_of = 1
 else:
     turn_of = 2
 
 while True:
-    # each turn we know which players message we are getting.
 
-    if (turn_of == 1):
+    # each turn we know which players message we are getting.
+    if turn_of == 1:
         res = client_1.recv(1024)
         move = -1
         print('res:%s' % res)
@@ -45,14 +46,13 @@ while True:
         except:
             print("Failed to read")
 
-        #if game over - restart
-
         # send client 2 the turn
         # and move the turn to him
-
         client_2.send(('command:new_move; move:%s' % move).encode())
         print('move sent to client2:%s' % move)
-        turn_of = 2
+
+        # in case white restarts, do not pass the turn
+        turn_of = 1 if move == 'end_game' and role_1 == 0 else 2
     else:
         res = client_2.recv(1024)
         move = -1
@@ -64,10 +64,10 @@ while True:
         except:
             print("Failed to read")
 
-        # if game over - restart
-
         # send client 1 the turn
         # and move the turn to him
         client_1.send(('command:new_move; move:%s' % move).encode())
         print('move sent to client1:%s' % move)
-        turn_of = 1
+
+        # in case white restarts, do not pass the turn
+        turn_of = 2 if move == 'end_game' and role_2 == 0 else 1
