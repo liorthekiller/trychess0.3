@@ -1,3 +1,5 @@
+import math
+
 import pygame
 import pickle
 from time import sleep
@@ -6,12 +8,13 @@ from clientSocket import ClientSocket
 connection = ClientSocket()
 click_coord = None
 
-# def init that contains all the initialization of the gui of the chess
 CELL_SIZE = 80
 pygame.init()
 width = 10 * CELL_SIZE
 height = 9 * CELL_SIZE
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+new_width = screen.get_width()
+new_height = screen.get_height()
 pygame.display.set_caption('CHESS1')
 font = pygame.font.Font('freesansbold.ttf', int(0.2 * CELL_SIZE))
 medium_font = pygame.font.Font('freesansbold.ttf', int(0.4 * CELL_SIZE))
@@ -110,6 +113,110 @@ counter = 0
 winner = ''
 game_over = False
 
+# def init that contains all the initialization of the gui of the chess
+def init():
+    pygame.init()
+    width = 10 * CELL_SIZE
+    height = 9 * CELL_SIZE
+    screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+    pygame.display.set_caption('CHESS1')
+    font = pygame.font.Font('freesansbold.ttf', int(0.2 * CELL_SIZE))
+    medium_font = pygame.font.Font('freesansbold.ttf', int(0.4 * CELL_SIZE))
+    big_font = pygame.font.Font('freesansbold.ttf', 0)
+    timer = pygame.time.Clock()
+    fps = 60
+
+    pieces_list = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+                   'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+
+    white_pieces = pieces_list.copy()
+    black_pieces = pieces_list.copy()
+
+    opponent_pieces_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
+                                 (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+
+    player_pieces_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
+                               (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
+
+    captured_pieces_white = []
+    captured_pieces_black = []
+    valid_moves = []
+
+    while connection.player_role == -1:
+        sleep(1)
+
+    if connection.player_role == "0":
+        white_locations, black_locations = player_pieces_locations, opponent_pieces_locations
+    else:
+        black_locations, white_locations = player_pieces_locations, opponent_pieces_locations
+
+    turn_step = 0
+    selection = 100
+    big_figure_size = 0.8 * CELL_SIZE
+    small_figure_size = 0.45 * CELL_SIZE
+    pawn_figure_size = 0.65 * CELL_SIZE
+    black_rook = pygame.image.load('sprites/b.rook.png')
+    black_rook = pygame.transform.scale(black_rook, (big_figure_size, big_figure_size))
+    black_rook_small = pygame.transform.scale(black_rook, (small_figure_size, small_figure_size))
+
+    black_knight = pygame.image.load('sprites/b.knight.png')
+    black_knight = pygame.transform.scale(black_knight, (big_figure_size, big_figure_size))
+    black_knight_small = pygame.transform.scale(black_knight, (small_figure_size, small_figure_size))
+
+    black_bishop = pygame.image.load('sprites/b.bishop.png')
+    black_bishop = pygame.transform.scale(black_bishop, (big_figure_size, big_figure_size))
+    black_bishop_small = pygame.transform.scale(black_bishop, (small_figure_size, small_figure_size))
+
+    black_king = pygame.image.load('sprites/shhh.png')
+    black_king = pygame.transform.scale(black_king, (big_figure_size, big_figure_size))
+    black_king_small = pygame.transform.scale(black_king, (small_figure_size, small_figure_size))
+
+    black_queen = pygame.image.load('sprites/b.queen.png')
+    black_queen = pygame.transform.scale(black_queen, (big_figure_size, big_figure_size))
+    black_queen_small = pygame.transform.scale(black_queen, (small_figure_size, small_figure_size))
+
+    black_pawn = pygame.image.load('sprites/b.pawn.png')
+    black_pawn = pygame.transform.scale(black_pawn, (pawn_figure_size, pawn_figure_size))
+    black_pawn_small = pygame.transform.scale(black_pawn, (small_figure_size, small_figure_size))
+
+    white_rook = pygame.image.load('sprites/w.rook.png')
+    white_rook = pygame.transform.scale(white_rook, (big_figure_size, big_figure_size))
+    white_rook_small = pygame.transform.scale(white_rook, (small_figure_size, small_figure_size))
+
+    white_knight = pygame.image.load('sprites/w.knight.png')
+    white_knight = pygame.transform.scale(white_knight, (big_figure_size, big_figure_size))
+    white_knight_small = pygame.transform.scale(white_knight, (small_figure_size, small_figure_size))
+
+    white_bishop = pygame.image.load('sprites/w.bishop.png')
+    white_bishop = pygame.transform.scale(white_bishop, (big_figure_size, big_figure_size))
+    white_bishop_small = pygame.transform.scale(white_bishop, (small_figure_size, small_figure_size))
+
+    white_king = pygame.image.load('sprites/w.king.png')
+    white_king = pygame.transform.scale(white_king, (big_figure_size, big_figure_size))
+    white_king_small = pygame.transform.scale(white_king, (small_figure_size, small_figure_size))
+
+    white_queen = pygame.image.load('sprites/w.queen.png')
+    white_queen = pygame.transform.scale(white_queen, (big_figure_size, big_figure_size))
+    white_queen_small = pygame.transform.scale(white_queen, (small_figure_size, small_figure_size))
+
+    white_pawn = pygame.image.load('sprites/w.pawn.png')
+    white_pawn = pygame.transform.scale(white_pawn, (pawn_figure_size, pawn_figure_size))
+    white_pawn_small = pygame.transform.scale(white_pawn, (small_figure_size, small_figure_size))
+
+    white_images = [white_pawn, white_queen, white_king, white_knight, white_rook, white_bishop]
+    small_white_images = [white_pawn_small, white_queen_small, white_king_small, white_knight_small,
+                          white_rook_small, white_bishop_small]
+
+    black_images = [black_pawn, black_queen, black_king, black_knight, black_rook, black_bishop]
+    small_black_images = [black_pawn_small, black_queen_small, black_king_small, black_knight_small,
+                          black_rook_small, black_bishop_small]
+
+    piece_list = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
+
+    counter = 0
+    winner = ''
+    game_over = False
+
 
 def draw_board():
     for i in range(32):
@@ -137,22 +244,22 @@ def draw_opponent_pieces(pieces, locations, pawn_image, pieces_images):
     for i in range(len(pieces)):
         index = piece_list.index(pieces[i])
         if pieces[i] == 'pawn':
-            screen.blit(pawn_image, (locations[i][0] * CELL_SIZE + 22, locations[i][1] * CELL_SIZE + 30))
+            screen.blit(pawn_image,
+                        (locations[i][0] * CELL_SIZE + 0.18 * CELL_SIZE, locations[i][1] * CELL_SIZE + 0.25 * CELL_SIZE))
         else:
-            screen.blit(pieces_images[index], (locations[i][0] * CELL_SIZE + 10, locations[i][1] * CELL_SIZE + 10))
-        # if turn_step < 2:
-        #     if selection == i:
-        #         pygame.draw.rect(screen, 'red',
-        #                          (locations[i][0] * 100 - 1, locations[i][1] * 100 - 1, 100, 100), 2)
+            screen.blit(pieces_images[index],
+                        (locations[i][0] * CELL_SIZE + 0.1 * CELL_SIZE, locations[i][1] * CELL_SIZE + 0.1 * CELL_SIZE))
 
 
 def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
     for i in range(len(pieces)):
         index = piece_list.index(pieces[i])
         if pieces[i] == 'pawn':
-            screen.blit(pawn_image, (locations[i][0] * CELL_SIZE + 22, locations[i][1] * CELL_SIZE + 30))
+            screen.blit(pawn_image, (
+                locations[i][0] * CELL_SIZE + 0.18 * CELL_SIZE, locations[i][1] * CELL_SIZE + 0.25 * CELL_SIZE))
         else:
-            screen.blit(pieces_images[index], (locations[i][0] * CELL_SIZE + 10, locations[i][1] * CELL_SIZE + 10))
+            screen.blit(pieces_images[index],
+                        (locations[i][0] * CELL_SIZE + 0.1 * CELL_SIZE, locations[i][1] * CELL_SIZE + 0.1 * CELL_SIZE))
 
         if selection == i:
             pygame.draw.rect(screen, 'blue', (locations[i][0] * CELL_SIZE + 1, locations[i][1] * CELL_SIZE + 1,
@@ -288,6 +395,7 @@ def check_rook(position, color):
 
 
 def check_pawn(position, color):
+    # interesting bug - can jump through stuff in the first move if of pawn
     moves_list = []
     if connection.player_role == "0":
         if color == 'black':
@@ -402,7 +510,8 @@ def draw_check():
                 if king_location in black_options[i]:
                     if counter < 15:
                         pygame.draw.rect(screen, 'dark red', [white_locations[king_index][0] * CELL_SIZE + 1,
-                                                              white_locations[king_index][1] * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE], 5)
+                                                              white_locations[king_index][1] * CELL_SIZE + 1, CELL_SIZE,
+                                                              CELL_SIZE], 5)
     else:
         if 'king' in black_pieces:
             king_index = black_pieces.index('king')
@@ -411,7 +520,8 @@ def draw_check():
                 if king_location in white_options[i]:
                     if counter < 15:
                         pygame.draw.rect(screen, 'dark blue', [black_locations[king_index][0] * CELL_SIZE + 1,
-                                                               black_locations[king_index][1] * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE], 5)
+                                                               black_locations[king_index][1] * CELL_SIZE + 1,
+                                                               CELL_SIZE, CELL_SIZE], 5)
 
 
 def is_can_restart():
@@ -426,7 +536,8 @@ def draw_game_over():
     if is_can_restart():
         screen.blit(font.render(f'press ENTER to restart!', True, 'white'), (2.1 * CELL_SIZE, 2.4 * CELL_SIZE))
     else:
-        screen.blit(font.render(f'please wait for your opponent to restart', True, 'white'), (2.1 * CELL_SIZE, 2.4 * CELL_SIZE))
+        screen.blit(font.render(f'please wait for your opponent to restart', True, 'white'),
+                    (2.1 * CELL_SIZE, 2.4 * CELL_SIZE))
 
 
 # gets a move and returns the mirror of it
@@ -472,6 +583,7 @@ while run:
     if connection.new_move[0] == 1:
         print("i got a move from my opponent")
         if connection.player_role != "0":
+
             # gets the new move from server, needs to render to board accordingly to new move and change its status
             # back to -1
             move = connection.new_move[1]
@@ -587,8 +699,8 @@ while run:
             run = False
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
-            x_coord = event.pos[0] // CELL_SIZE
-            y_coord = event.pos[1] // CELL_SIZE
+            x_coord = int(event.pos[0] // CELL_SIZE)
+            y_coord = int(event.pos[1] // CELL_SIZE)
             prev_click_coord = (-1, -1)
 
             if click_coord:
@@ -822,6 +934,15 @@ while run:
                 white_options = check_options(white_pieces, white_locations, 'white')
                 print("I want to restart game")
                 connection.__send__(pickle.dumps("end_game"))
+
+        if event.type == pygame.VIDEORESIZE:
+            CELL_SIZE = event.w / 10 if event.w / 10 < event.h / 9 else event.h / 9
+            init()
+            # screen = pygame.display.set_mode((event.w, event.h))
+            #
+            # new_width = screen.get_width()
+            # new_height = screen.get_height()
+
 
     if winner != '':
         game_over = True
