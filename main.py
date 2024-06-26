@@ -575,6 +575,7 @@ while run:
 
     # the actual handling of the players move
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             run = False
 
@@ -601,7 +602,9 @@ while run:
                     # status back to -1
                     move = connection.new_move[1]
                     print('got new move:%s' % move)
+
                     if move == "end_game": break
+
                     print("not broke")
                     moves = move.split("), (")
                     move_from, move_to = moves[0], moves[1]
@@ -624,6 +627,7 @@ while run:
                     if move_to_coord in black_locations:
                         black_piece = black_locations.index(move_to_coord)
                         captured_pieces_white.append(black_pieces[black_piece])
+
                         if black_pieces[black_piece] == 'king':
                             winner = 'white'
                         black_pieces.pop(black_piece)
@@ -639,14 +643,17 @@ while run:
                 else:
                     if click_coord == (8, 8) or click_coord == (9, 8):
                         winner = 'black'
+
                     if click_coord in white_locations:
+
                         # white
                         selection = white_locations.index(click_coord)
                         print("white", prev_click_coord)
+
                         if turn_step == 0:
                             turn_step = 1
 
-                    if click_coord in valid_moves and selection != 100:
+                    elif click_coord in valid_moves and selection != 100:
                         # change whites coordinates
                         white_locations[selection] = click_coord
                         print("white move to", click_coord)
@@ -656,6 +663,7 @@ while run:
                         if click_coord in black_locations:
                             black_piece = black_locations.index(click_coord)
                             captured_pieces_white.append(black_pieces[black_piece])
+
                             if black_pieces[black_piece] == 'king':
                                 winner = 'white'
                             black_pieces.pop(black_piece)
@@ -667,20 +675,23 @@ while run:
                         connection.__send__(data)
                         print(pickle.loads(data))
                         print("move sent to server")
-
                         black_options = check_options(black_pieces, black_locations, 'black')
                         white_options = check_options(white_pieces, white_locations, 'white')
                         turn_step = 2
-
                         selection = 100
                         valid_moves = []
-                        break
+                        break # important for flow of data to server
+
+                    else:
+                        selection = 100
+                        valid_moves = []
 
             # black move
             if turn_step > 1:
 
                 # if the players role is white, he just waits for a message from the server
                 if connection.player_role == "0":
+
                     while connection.new_move[0] == -1:
                         print("black move im white waiting for new move")
                         sleep(1)
@@ -692,14 +703,16 @@ while run:
                     # to new move and change its status back to -1
                     move = connection.new_move[1]
                     print('got new move:%s' % move)
+
                     if move == "end_game": break
+
                     print("not broke")
                     moves = move.split("), (")
                     move_from, move_to = moves[0], moves[1]
-
                     move_from_coord = (int(move_from.split(", ")[0].split("(")[1]), int(move_from.split(", ")[1]))
                     selection = black_locations.index(move_from_coord)
                     print("black", prev_click_coord)
+
                     if turn_step == 2:
                         turn_step = 3
 
@@ -730,13 +743,15 @@ while run:
                     if click_coord == (8, 8) or click_coord == (9, 8):
                         winner = 'white'
                     if click_coord in black_locations:
+
                         # black
                         selection = black_locations.index(click_coord)
                         print("black try:", click_coord)
 
                         if turn_step == 2:
                             turn_step = 3
-                    if click_coord in valid_moves and selection != 100:
+
+                    elif click_coord in valid_moves and selection != 100:
                         # black
                         black_locations[selection] = click_coord
                         print("black move to", click_coord)
@@ -761,6 +776,10 @@ while run:
                         black_options = check_options(black_pieces, black_locations, 'black')
                         white_options = check_options(white_pieces, white_locations, 'white')
                         turn_step = 0
+                        selection = 100
+                        valid_moves = []
+
+                    else:
                         selection = 100
                         valid_moves = []
 
