@@ -7,13 +7,14 @@ connection = ClientSocket()
 click_coord = None
 
 # def init that contains all the initialization of the gui of the chess
+CELL_SIZE = 80
 pygame.init()
-width = 1000
-height = 900
+width = 10 * CELL_SIZE
+height = 9 * CELL_SIZE
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('CHESS1')
-font = pygame.font.Font('freesansbold.ttf', 20)
-medium_font = pygame.font.Font('freesansbold.ttf', 40)
+font = pygame.font.Font('freesansbold.ttf', int(0.2 * CELL_SIZE))
+medium_font = pygame.font.Font('freesansbold.ttf', int(0.4 * CELL_SIZE))
 big_font = pygame.font.Font('freesansbold.ttf', 0)
 timer = pygame.time.Clock()
 fps = 60
@@ -44,54 +45,56 @@ else:
 
 turn_step = 0
 selection = 100
-
+big_figure_size = 0.8 * CELL_SIZE
+small_figure_size = 0.45 * CELL_SIZE
+pawn_figure_size = 0.65 * CELL_SIZE
 black_rook = pygame.image.load('sprites/b.rook.png')
-black_rook = pygame.transform.scale(black_rook, (80, 80))
-black_rook_small = pygame.transform.scale(black_rook, (45, 45))
+black_rook = pygame.transform.scale(black_rook, (big_figure_size, big_figure_size))
+black_rook_small = pygame.transform.scale(black_rook, (small_figure_size, small_figure_size))
 
 black_knight = pygame.image.load('sprites/b.knight.png')
-black_knight = pygame.transform.scale(black_knight, (80, 80))
-black_knight_small = pygame.transform.scale(black_knight, (45, 45))
+black_knight = pygame.transform.scale(black_knight, (big_figure_size, big_figure_size))
+black_knight_small = pygame.transform.scale(black_knight, (small_figure_size, small_figure_size))
 
 black_bishop = pygame.image.load('sprites/b.bishop.png')
-black_bishop = pygame.transform.scale(black_bishop, (80, 80))
-black_bishop_small = pygame.transform.scale(black_bishop, (45, 45))
+black_bishop = pygame.transform.scale(black_bishop, (big_figure_size, big_figure_size))
+black_bishop_small = pygame.transform.scale(black_bishop, (small_figure_size, small_figure_size))
 
 black_king = pygame.image.load('sprites/shhh.png')
-black_king = pygame.transform.scale(black_king, (80, 80))
-black_king_small = pygame.transform.scale(black_king, (45, 45))
+black_king = pygame.transform.scale(black_king, (big_figure_size, big_figure_size))
+black_king_small = pygame.transform.scale(black_king, (small_figure_size, small_figure_size))
 
 black_queen = pygame.image.load('sprites/b.queen.png')
-black_queen = pygame.transform.scale(black_queen, (80, 80))
-black_queen_small = pygame.transform.scale(black_queen, (45, 45))
+black_queen = pygame.transform.scale(black_queen, (big_figure_size, big_figure_size))
+black_queen_small = pygame.transform.scale(black_queen, (small_figure_size, small_figure_size))
 
 black_pawn = pygame.image.load('sprites/b.pawn.png')
-black_pawn = pygame.transform.scale(black_pawn, (65, 65))
-black_pawn_small = pygame.transform.scale(black_pawn, (45, 45))
+black_pawn = pygame.transform.scale(black_pawn, (pawn_figure_size, pawn_figure_size))
+black_pawn_small = pygame.transform.scale(black_pawn, (small_figure_size, small_figure_size))
 
 white_rook = pygame.image.load('sprites/w.rook.png')
-white_rook = pygame.transform.scale(white_rook, (80, 80))
-white_rook_small = pygame.transform.scale(white_rook, (45, 45))
+white_rook = pygame.transform.scale(white_rook, (big_figure_size, big_figure_size))
+white_rook_small = pygame.transform.scale(white_rook, (small_figure_size, small_figure_size))
 
 white_knight = pygame.image.load('sprites/w.knight.png')
-white_knight = pygame.transform.scale(white_knight, (80, 80))
-white_knight_small = pygame.transform.scale(white_knight, (45, 45))
+white_knight = pygame.transform.scale(white_knight, (big_figure_size, big_figure_size))
+white_knight_small = pygame.transform.scale(white_knight, (small_figure_size, small_figure_size))
 
 white_bishop = pygame.image.load('sprites/w.bishop.png')
-white_bishop = pygame.transform.scale(white_bishop, (80, 80))
-white_bishop_small = pygame.transform.scale(white_bishop, (45, 45))
+white_bishop = pygame.transform.scale(white_bishop, (big_figure_size, big_figure_size))
+white_bishop_small = pygame.transform.scale(white_bishop, (small_figure_size, small_figure_size))
 
 white_king = pygame.image.load('sprites/w.king.png')
-white_king = pygame.transform.scale(white_king, (80, 80))
-white_king_small = pygame.transform.scale(white_king, (45, 45))
+white_king = pygame.transform.scale(white_king, (big_figure_size, big_figure_size))
+white_king_small = pygame.transform.scale(white_king, (small_figure_size, small_figure_size))
 
 white_queen = pygame.image.load('sprites/w.queen.png')
-white_queen = pygame.transform.scale(white_queen, (80, 80))
-white_queen_small = pygame.transform.scale(white_queen, (45, 45))
+white_queen = pygame.transform.scale(white_queen, (big_figure_size, big_figure_size))
+white_queen_small = pygame.transform.scale(white_queen, (small_figure_size, small_figure_size))
 
 white_pawn = pygame.image.load('sprites/w.pawn.png')
-white_pawn = pygame.transform.scale(white_pawn, (65, 65))
-white_pawn_small = pygame.transform.scale(white_pawn, (45, 45))
+white_pawn = pygame.transform.scale(white_pawn, (pawn_figure_size, pawn_figure_size))
+white_pawn_small = pygame.transform.scale(white_pawn, (small_figure_size, small_figure_size))
 
 white_images = [white_pawn, white_queen, white_king, white_knight, white_rook, white_bishop]
 small_white_images = [white_pawn_small, white_queen_small, white_king_small, white_knight_small,
@@ -113,28 +116,30 @@ def draw_board():
         column = i % 4
         row = i // 4
         if row % 2 == 0:
-            pygame.draw.rect(screen, 'light gray', [600 - (column * 200), row * 100, 100, 100])
+            pygame.draw.rect(screen, 'light gray',
+                             [6 * CELL_SIZE - (column * 2 * CELL_SIZE), row * CELL_SIZE, CELL_SIZE, CELL_SIZE])
         else:
-            pygame.draw.rect(screen, 'light gray', [700 - (column * 200), row * 100, 100, 100])
-        pygame.draw.rect(screen, 'gray', [0, 800, width, 100])
-        pygame.draw.rect(screen, 'blue', [0, 800, width, 100], 5)
-        pygame.draw.rect(screen, 'blue', [800, 0, 200, height], 5)
+            pygame.draw.rect(screen, 'light gray',
+                             [7 * CELL_SIZE - (column * 2 * CELL_SIZE), row * CELL_SIZE, CELL_SIZE, CELL_SIZE])
+        pygame.draw.rect(screen, 'gray', [0, 8 * CELL_SIZE, width, CELL_SIZE])
+        pygame.draw.rect(screen, 'blue', [0, 8 * CELL_SIZE, width, CELL_SIZE], 5)
+        pygame.draw.rect(screen, 'blue', [8 * CELL_SIZE, 0, 2 * CELL_SIZE, height], 5)
         status_text = ['White: Choose a piece to play', 'White: Choose his destination',
                        'Black: Choose a piece to play', 'Black: Choose his destination']
-        screen.blit(big_font.render(status_text[turn_step], True, 'black'), (20, 820))
+        screen.blit(big_font.render(status_text[turn_step], True, 'black'), (0.2 * CELL_SIZE, 8.2 * CELL_SIZE))
         for i in range(9):
-            pygame.draw.line(screen, 'black', (0, 100 * i), (800, 100 * i), 2)
-            pygame.draw.line(screen, 'black', (100 * i, 0), (100 * i, 800), 2)
-        screen.blit(medium_font.render('GIVE UP', True, 'black'), (810, 830))
+            pygame.draw.line(screen, 'black', (0, CELL_SIZE * i), (8 * CELL_SIZE, CELL_SIZE * i), 2)
+            pygame.draw.line(screen, 'black', (CELL_SIZE * i, 0), (CELL_SIZE * i, 8 * CELL_SIZE), 2)
+        screen.blit(medium_font.render('GIVE UP', True, 'black'), (8.1 * CELL_SIZE, 8.3 * CELL_SIZE))
 
 
 def draw_opponent_pieces(pieces, locations, pawn_image, pieces_images):
     for i in range(len(pieces)):
         index = piece_list.index(pieces[i])
         if pieces[i] == 'pawn':
-            screen.blit(pawn_image, (locations[i][0] * 100 + 22, locations[i][1] * 100 + 30))
+            screen.blit(pawn_image, (locations[i][0] * CELL_SIZE + 22, locations[i][1] * CELL_SIZE + 30))
         else:
-            screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
+            screen.blit(pieces_images[index], (locations[i][0] * CELL_SIZE + 10, locations[i][1] * CELL_SIZE + 10))
         # if turn_step < 2:
         #     if selection == i:
         #         pygame.draw.rect(screen, 'red',
@@ -145,13 +150,13 @@ def draw_player_pieces(pieces, locations, pawn_image, pieces_images):
     for i in range(len(pieces)):
         index = piece_list.index(pieces[i])
         if pieces[i] == 'pawn':
-            screen.blit(pawn_image, (locations[i][0] * 100 + 22, locations[i][1] * 100 + 30))
+            screen.blit(pawn_image, (locations[i][0] * CELL_SIZE + 22, locations[i][1] * CELL_SIZE + 30))
         else:
-            screen.blit(pieces_images[index], (locations[i][0] * 100 + 10, locations[i][1] * 100 + 10))
+            screen.blit(pieces_images[index], (locations[i][0] * CELL_SIZE + 10, locations[i][1] * CELL_SIZE + 10))
 
         if selection == i:
-            pygame.draw.rect(screen, 'blue', (locations[i][0] * 100 + 1, locations[i][1] * 100 + 1,
-                                              100, 100), 2)
+            pygame.draw.rect(screen, 'blue', (locations[i][0] * CELL_SIZE + 1, locations[i][1] * CELL_SIZE + 1,
+                                              CELL_SIZE, CELL_SIZE), 2)
 
 
 def draw_pieces():
@@ -372,19 +377,20 @@ def check_valid_moves():
 
 def draw_valid(moves):
     for i in range(len(moves)):
-        pygame.draw.circle(screen, 'blue', (moves[i][0] * 100 + 50, moves[i][1] * 100 + 50), 5)
+        pygame.draw.circle(screen, 'blue',
+                           (moves[i][0] * CELL_SIZE + (CELL_SIZE / 2), moves[i][1] * CELL_SIZE + (CELL_SIZE / 2)), 5)
 
 
 def draw_captured():
     for i in range(len(captured_pieces_white)):
         captured_piece = captured_pieces_white[i]
         index = piece_list.index(captured_piece)
-        screen.blit(small_black_images[index], (825, 5 + 50 * i))
+        screen.blit(small_black_images[index], (8.25 * CELL_SIZE, 5 + (CELL_SIZE / 2) * i))
 
     for i in range(len(captured_pieces_black)):
         captured_piece = captured_pieces_black[i]
         index = piece_list.index(captured_piece)
-        screen.blit(small_white_images[index], (925, 5 + 50 * i))
+        screen.blit(small_white_images[index], (9.25 * CELL_SIZE, 5 + (CELL_SIZE / 2) * i))
 
 
 def draw_check():
@@ -395,8 +401,8 @@ def draw_check():
             for i in range(len(black_options)):
                 if king_location in black_options[i]:
                     if counter < 15:
-                        pygame.draw.rect(screen, 'dark red', [white_locations[king_index][0] * 100 + 1,
-                                                              white_locations[king_index][1] * 100 + 1, 100, 100], 5)
+                        pygame.draw.rect(screen, 'dark red', [white_locations[king_index][0] * CELL_SIZE + 1,
+                                                              white_locations[king_index][1] * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE], 5)
     else:
         if 'king' in black_pieces:
             king_index = black_pieces.index('king')
@@ -404,8 +410,8 @@ def draw_check():
             for i in range(len(white_options)):
                 if king_location in white_options[i]:
                     if counter < 15:
-                        pygame.draw.rect(screen, 'dark blue', [black_locations[king_index][0] * 100 + 1,
-                                                               black_locations[king_index][1] * 100 + 1, 100, 100], 5)
+                        pygame.draw.rect(screen, 'dark blue', [black_locations[king_index][0] * CELL_SIZE + 1,
+                                                               black_locations[king_index][1] * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE], 5)
 
 
 def is_can_restart():
@@ -414,13 +420,13 @@ def is_can_restart():
 
 
 def draw_game_over():
-    pygame.draw.rect(screen, 'black', (200, 200, 400, 70))
-    screen.blit(font.render(f'{winner} won the game!', True, 'white'), (210, 210))
+    pygame.draw.rect(screen, 'black', (2 * CELL_SIZE, 2 * CELL_SIZE, 4 * CELL_SIZE, 0.7 * CELL_SIZE))
+    screen.blit(font.render(f'{winner} won the game!', True, 'white'), (2.1 * CELL_SIZE, 2.1 * CELL_SIZE))
 
     if is_can_restart():
-        screen.blit(font.render(f'press ENTER to restart!', True, 'white'), (210, 240))
+        screen.blit(font.render(f'press ENTER to restart!', True, 'white'), (2.1 * CELL_SIZE, 2.4 * CELL_SIZE))
     else:
-        screen.blit(font.render(f'please wait for your opponent to restart', True, 'white'), (210, 240))
+        screen.blit(font.render(f'please wait for your opponent to restart', True, 'white'), (2.1 * CELL_SIZE, 2.4 * CELL_SIZE))
 
 
 # gets a move and returns the mirror of it
@@ -545,6 +551,7 @@ while run:
     # got new move from server
     if connection.new_move[0] == 2:
         print("i got a command to restart the game")
+
         # RESTART GAME
         game_over = False
         winner = ''
@@ -580,8 +587,8 @@ while run:
             run = False
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
-            x_coord = event.pos[0] // 100
-            y_coord = event.pos[1] // 100
+            x_coord = event.pos[0] // CELL_SIZE
+            y_coord = event.pos[1] // CELL_SIZE
             prev_click_coord = (-1, -1)
 
             if click_coord:
@@ -680,7 +687,7 @@ while run:
                         turn_step = 2
                         selection = 100
                         valid_moves = []
-                        break # important for flow of data to server
+                        break  # important for flow of data to server
 
                     else:
                         selection = 100
@@ -717,6 +724,7 @@ while run:
                         turn_step = 3
 
                     move_to_coord = (int(move_to.split(", ")[0]), int(move_to.split(", ")[1].split(")")[0]))
+
                     # change black coordinates
                     black_locations[selection] = move_to_coord
                     print("black move to", move_to_coord)
