@@ -938,10 +938,6 @@ while run:
         if event.type == pygame.VIDEORESIZE:
             CELL_SIZE = event.w / 10 if event.w / 10 < event.h / 9 else event.h / 9
             init()
-            # screen = pygame.display.set_mode((event.w, event.h))
-            #
-            # new_width = screen.get_width()
-            # new_height = screen.get_height()
 
 
     if winner != '':
